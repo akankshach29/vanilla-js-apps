@@ -1,0 +1,60 @@
+<!--Getting all child elements that match a selector-->
+<!--using forEach and matches()-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Get child nodes by selector</title>
+        <style type="text/css">
+            .blue {
+                color:blue;
+            }
+            .red {
+                color:red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Get all child elements that match a selector</h1>
+        <ul id="app">
+            <li class="blue">Blue</li>
+            <li class="blue">Blue</li>
+            <li class="red">Red</li>
+            <li class="blue">
+                Blue
+                <ul>
+                    <li class="blue">Blue</li>
+                    <li class="red">Red</li>
+                    <li class="blue">Blue</li>
+                </ul>
+            </li>
+            <li class="red">Red</li>
+            <li class="blue">Blue</li>
+        </ul>
+        <script>
+            var childMatches = function(parent, selector){
+                var children = parent.children;
+                console.log(children);
+                if(!selector) return children;
+
+                var filtered = [];
+                Array.prototype.forEach.call(children, function (child) {
+                    if (child.matches(selector)){
+                        filtered.push(child);
+                    }
+                });
+                // for(var i = 0; i < children; i++){
+                //     console.log('filtered');
+                //     console.log(children[i])
+                //     if(children[i].matches(selector)){
+                //         filtered.push(children[i])
+                //     }
+                // }
+                return filtered;
+            };
+
+            var app = document.querySelector('#app');
+            var matches = childMatches(app, '.blue')
+            console.log(matches)
+        </script>
+    </body>
+</html>
