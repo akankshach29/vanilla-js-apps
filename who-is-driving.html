@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Who is driving</title>
+</head>
+<body>
+   <h1>Who is Driving?</h1> 
+   <div id="app"></div>
+   <form id="add-driver">
+       <input id="potential-driver" placeholder="Driver name" />
+       <button id="add-driver">Add Driver</button>
+   </form>
+   <button id="pick-driver">Who's driving?</button>
+   <button id="clear-drivers">Clear Driver</button>
+   <script>
+       let data = {
+           drivers: [],
+           selected: null
+       };
+       let template = function(){
+           let driverList = data.drivers.map(driver => {
+               return '<li>' + driver + '<button data-remove-driver=" '+ driver +' ">Remove Drivers</button></li>'
+           });           
+           let htmlMarkup = '';
+            if(driverList.length > 0){
+                htmlMarkup += '<ul>' + driverList.join('') + '</ul>';
+            }
+            if(data.selected){
+                htmlMarkup += '<p><strong>Our driver is ' + data.selected + '</strong></p>'
+            }
+            return htmlMarkup;
+       }
+       let render = function(){
+           let app = document.querySelector('#app');
+           if(!app) return;
+           app.innerHTML = template();
+           emitEvent(app, data);
+       }
+       // randomize driver selection
+       let shuffleDriver = function(driverArr){
+           let arrClone = driverArr.slice();
+           return arrClone.sort(function(){
+               return Math.random() - 0.5;
+           })
+       }
+       let getDriversFromStorage = function(){
+           let drivers = localStorage.getItem('whoIsDriving')
+           if(drivers){
+               data.drivers = JSON.parse(drivers);
+           }
+       }
+       // handle submit events
+       let submitHandler = function(event){
+        if(!event.target.matches('#add-driver')) return;
+           event.preventDefault();
+           // get the field
+           let driver = event.target.querySelector('#potential-driver');
+           if(!driver || driver.value.length < 1) return;
+           // update data and UI
+           data.drivers.push(driver.value);
+           render();
+           // clear after update and re focus
+           driver.value = '';
+           driver.focus()
+       }
+       // Handle click events
+       let clickHandler = function(event){
+           if(event.target.matches('[data-remove-driver]')){
+            let index = event.target.getAttribute('data-remove-driver')
+            data.drivers.splice(index, 1);
+            render();
+           }
+           if(event.target.matches('#pick-driver')){
+            let randomize = shuffleDriver(data.drivers);
+            data.selected = randomize[0];
+            render();
+           }
+           if(event.target.matches('#clear-drivers')){
+            data.drivers = [];
+            render();
+           }
+       }
+       // handle render 
+       let renderHandler = function(event){
+           localStorage.setItem('whoIsDriving', JSON.stringify(event.detail.drivers))
+       }      
+       // event listners
+       document.addEventListener('submit', submitHandler, false);
+       document.documentElement.addEventListener('click', clickHandler, false);
+       document.addEventListener('render', renderHandler, false);
+       // initial render
+       render();      
+   </script>
+</body>
+</html>
