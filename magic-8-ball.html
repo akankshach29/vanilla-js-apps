@@ -1,0 +1,67 @@
+<!---get random elements from an array-->
+<!---prevent page from XSS attack using sanitizeHTML.js-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Magic 8-Ball</title>
+</head>
+<body>
+    <h1>Magic 8-Ball</h1>
+    <form id="app">
+        <label for="quest">What is your question?</label>
+        <input type="text" id="quest" />
+        <button>Ask the 8-ball</button>
+    </form>
+    <div id="ans"></div>
+    <script>
+        var form = document.querySelector("#app");
+        var question = document.querySelector("#quest");
+        var answer = document.querySelector("#ans");
+        var answers = ['turkey', 'tuna', 'pb&j'];
+
+        var sanitizeHTML = function (str) {
+            var temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        };
+
+        var shuffle = function (array) {
+            var currentIndex = array.length;
+            var temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        };
+
+        var getAnswers = function(){
+            return shuffle(answers.slice())[0];
+        };
+
+        var submitHandler = function(event){
+            // prevent the form from causing a page reload
+            event.preventDefault();
+            if(!question.value) return;
+            answer.innerHTML = '<p>' + sanitizeHTML(question.value) + '</p>' + 
+            '<p>' + getAnswers() + '</p>'  
+            
+            question.value = '';
+        }
+
+        // event listner
+        form.addEventListener('submit', submitHandler, false);
+    </script>
+</body>
+</html>
